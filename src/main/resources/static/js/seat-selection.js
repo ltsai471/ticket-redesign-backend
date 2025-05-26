@@ -123,20 +123,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (result.startsWith('error')) {
                     throw new Error(result);
                 }
-                // Show success message
-                const successAlert = document.createElement('div');
-                successAlert.className = 'alert alert-success mt-3';
-                successAlert.textContent = `Ticket purchased successfully! Ticket ID: ${result}`;
-                seatMap.insertAdjacentElement('afterend', successAlert);
-                
-                // Update seat status in UI
-                selectedSeat.classList.remove('selected');
-                selectedSeat.classList.add('unavailable');
-                selectedSeat = null;
-                
-                // Reset button
-                nextButton.disabled = true;
-                nextButton.textContent = 'Next';
+                // Redirect to success page with ticket details
+                const seatInfo = `Area ${seatData.area}, Row ${seatData.row}, Column ${seatData.column}`;
+                window.location.href = `/ticket/success?ticketId=${result}&seatInfo=${encodeURIComponent(seatInfo)}`;
             })
             .catch(error => {
                 console.error('Error purchasing ticket:', error);
