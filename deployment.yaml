@@ -1,0 +1,151 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ticket-system
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ticket-system
+  template:
+    metadata:
+      labels:
+        app: ticket-system
+    spec:
+      containers:
+        - name: ticket-system
+          image: ltsai471/ticket-system:latest
+          imagePullPolicy: "Always"
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: "prod"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ticket-system-app-service
+spec:
+  selector:
+    app: ticket-system
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ticket-system-actuator-service
+spec:
+  selector:
+    app: ticket-system
+  ports:
+    - protocol: TCP
+      port: 8081
+      targetPort: 8081
+  type: LoadBalancer
+## Cassandra PersistentVolume (PV)
+#apiVersion: v1
+#kind: PersistentVolume
+#metadata:
+#  name: cassandra-pv
+#spec:
+#  capacity:
+#    storage: 10Gi
+#  accessModes:
+#    - ReadWriteOnce
+#  hostPath:
+#    path: /home/laura/桌面/apache-cassandra-4.0.14/bin/cassandra #/data/cassandra
+#---
+## Cassandra PersistentVolumeClaim (PVC)
+#apiVersion: v1
+#kind: PersistentVolumeClaim
+#metadata:
+#  name: cassandra-pvc
+#spec:
+#  accessModes:
+#    - ReadWriteOnce
+#  resources:
+#    requests:
+#      storage: 10Gi
+#---
+## Cassandra Deployment
+#apiVersion: apps/v1
+#kind: Deployment
+#metadata:
+#  name: cassandra
+#spec:
+#  replicas: 1
+#  selector:
+#    matchLabels:
+#      app: cassandra
+#  template:
+#    metadata:
+#      labels:
+#        app: cassandra
+#    spec:
+#      containers:
+#        - name: cassandra
+#          image: cassandra:latest
+#          ports:
+#            - containerPort: 9042
+#          volumeMounts:
+#            - mountPath: /var/lib/cassandra
+#              name: cassandra-storage
+#      volumes:
+#        - name: cassandra-storage
+#          persistentVolumeClaim:
+#            claimName: cassandra-pvc
+#---
+## Application Deployment (Using custom Docker image)
+#apiVersion: apps/v1
+#kind: Deployment
+#metadata:
+#  name: ticket-system
+#spec:
+#  replicas: 1
+#  selector:
+#    matchLabels:
+#      app: ticket-system
+#  template:
+#    metadata:
+#      labels:
+#        app: ticket-system
+#    spec:
+#      containers:
+#        - name: ticket-system
+#          image: ltsai471/ticket-system:latest   # 你的應用程序 Docker 映像
+#          ports:
+#            - containerPort: 8080         # 假設應用在 8080 端口運行
+#          env:
+#            - name: CASSANDRA_HOST
+#              value: "cassandra"           # Cassandra 的服務名稱，應用將連接它
+#---
+## Cassandra Service
+#apiVersion: v1
+#kind: Service
+#metadata:
+#  name: cassandra
+#spec:
+#  ports:
+#    - port: 9042
+#  selector:
+#    app: cassandra
+#---
+## Application Service
+#apiVersion: v1
+#kind: Service
+#metadata:
+#  name: ticket-system-service
+#spec:
+#  selector:
+#    app: ticket-system
+#  ports:
+#    - protocol: TCP
+#      port: 18080                        # 應用程序的外部端口
+#      targetPort: 8080                  # 容器內部的端口
+#  type: LoadBalancer                  # 可以是 ClusterIP 或 LoadBalancer
