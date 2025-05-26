@@ -11,11 +11,11 @@ public interface SeatRepository {
     @Select("SELECT * FROM seat WHERE id = #{id}")
     Optional<Seat> findById(Long id);
 
-    @Select("SELECT * FROM seat WHERE campaign_id = #{campaignId} AND area = #{area} AND seat_row = #{row} AND seat_column = #{column}")
+    @Select("SELECT * FROM seat WHERE campaign_id = #{campaignId} AND area = #{area} AND seat_row = #{seatRow} AND seat_column = #{seatColumn}")
     Optional<Seat> findByKey(@Param("campaignId") Long campaignId, 
                            @Param("area") String area, 
-                           @Param("seat_row") int row,
-                           @Param("seat_column") int column);
+                           @Param("seatRow") int seatRow,
+                           @Param("seatColumn") int seatColumn);
 
     @Insert("INSERT INTO seat (campaign_id, area, seat_row, seat_column, price, status) " +
             "VALUES (#{campaignId}, #{area}, #{seat_row}, #{seat_column}, #{price}, #{status})")

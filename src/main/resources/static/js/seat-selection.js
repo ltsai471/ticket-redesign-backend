@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let selectedSeat = null;
     const campaignId = 1; // This should be passed from the backend or URL parameter
     const MAX_SEATS_PER_ROW = 10;
+    const userId = 1; // This should be passed from the backend or URL parameter
 
     // Generate seat map
     function generateSeatMap(seats) {
@@ -110,10 +111,44 @@ document.addEventListener('DOMContentLoaded', function() {
             column: selectedSeat.dataset.column,
             seatId: selectedSeat.dataset.id
         };
+
+        // Disable button and show loading state
+        nextButton.disabled = true;
+        nextButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...';
         
-        // Here you would typically send the data to your backend
-        console.log('Selected seat:', seatData);
-        // Redirect to order creation page or show order form
-        window.location.href = `/order/create?seatId=${seatData.seatId}`;
+        // Call buyTicket API
+        fetch(`/oper/buyTicket?userId=${userId}&campaignId=${campaignId}&area=${seatData.area}&row=${seatData.row}&column=${seatData.column}`)
+            .then(response => response.text())
+            .then(result => {
+                if (result.startsWith('error')) {
+                    throw new Error(result);
+                }
+                // Show success message
+                const successAlert = document.createElement('div');
+                successAlert.className = 'alert alert-success mt-3';
+                successAlert.textContent = `Ticket purchased successfully! Ticket ID: ${result}`;
+                seatMap.insertAdjacentElement('afterend', successAlert);
+                
+                // Update seat status in UI
+                selectedSeat.classList.remove('selected');
+                selectedSeat.classList.add('unavailable');
+                selectedSeat = null;
+                
+                // Reset button
+                nextButton.disabled = true;
+                nextButton.textContent = 'Next';
+            })
+            .catch(error => {
+                console.error('Error purchasing ticket:', error);
+                // Show error message
+                const errorAlert = document.createElement('div');
+                errorAlert.className = 'alert alert-danger mt-3';
+                errorAlert.textContent = `Error: ${error.message}`;
+                seatMap.insertAdjacentElement('afterend', errorAlert);
+                
+                // Reset button
+                nextButton.disabled = false;
+                nextButton.textContent = 'Next';
+            });
     });
 }); 

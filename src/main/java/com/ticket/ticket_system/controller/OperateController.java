@@ -17,11 +17,11 @@ public class OperateController {
 
     @GetMapping("/buyTicket")
     public String buyTicket(@RequestParam(value = "userId") Long userId,
-                            @RequestParam(value = "campaignName") String campaignName,
+                            @RequestParam(value = "campaignId") Long campaignId,
                             @RequestParam(value = "area") String area,
                             @RequestParam(value = "row") int row,
                             @RequestParam(value = "column") int column) {
-        return ticketService.addTicket(userId, campaignName, area, row, column);
+        return ticketService.addTicket(userId, campaignId, area, row, column);
     }
 
     @GetMapping("/payTicket")

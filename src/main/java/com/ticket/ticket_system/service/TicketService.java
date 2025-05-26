@@ -24,14 +24,8 @@ public class TicketService {
 
     private final static Logger log = LoggerFactory.getLogger(TicketService.class);
 
-    public String addTicket(Long userId, String campaignName, String area, int row, int column) {
+    public String addTicket(Long userId, Long campaignId, String area, int row, int column) {
         try {
-            log.info("campaignRepository.findByName");
-            Campaign campaign = campaignRepository.findByName(campaignName);
-            if (campaign == null) return "error: no campaign";
-
-            log.info("seatRepository.findByKey");
-            Long campaignId = campaign.getId();
             Optional<Seat> seat = seatRepository.findByKey(campaignId, area, row, column);
             if (!seat.isPresent()) return "error: no seat";
 
