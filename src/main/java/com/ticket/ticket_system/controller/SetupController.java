@@ -33,7 +33,7 @@ public class SetupController {
         try {
             seatService.addSeats("A", 10, 10, 8000, campaignId);
             seatService.addSeats("B", 100, 100, 4000, campaignId);
-            seatService.addSeats("C", 500, 500, 2000, campaignId);
+            seatService.addSeats("C", 200, 200, 2000, campaignId);
             return "Done";
         } catch (Exception e) {
             return "Error";

@@ -1,0 +1,22 @@
+## Actuator endpoints configuration
+#management.endpoints.web.exposure.include=health,info,prometheus,metrics
+#management.endpoint.health.show-details=always
+#management.metrics.tags.application=${spring.application.name}
+#management.metrics.export.prometheus.enabled=true
+#
+## Metrics configuration
+#management.metrics.distribution.percentiles-histogram.http.server.requests=true
+#management.metrics.distribution.slo.http.server.requests=10ms, 50ms, 100ms, 200ms, 500ms
+#
+## Enable JVM metrics
+#management.metrics.enable.jvm=true
+#management.metrics.enable.process=true
+#management.metrics.enable.system=true
+#management.metrics.enable.tomcat=true
+#
+## Enable database metrics
+#management.metrics.enable.hikaricp=true
+#management.metrics.enable.jdbc=true
+#
+## Enable Kubernetes metrics
+#management.metrics.enable.kubernetes=true

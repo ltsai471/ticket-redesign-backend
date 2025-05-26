@@ -31,7 +31,7 @@ public class SeatService {
         try {
             for (int rowId = 1; rowId <= rowNum; rowId++) {
                 for (int colId = 1; colId <= columnNum; colId++) {
-                    addSeat(area, rowId, colId + 1, price, campaignId);
+                    addSeat(area, rowId, colId, price, campaignId);
                 }
             }
         } catch (Exception e) {
