@@ -1,28 +1,21 @@
 package com.ticket.ticket_system.entity;
 
-import java.util.UUID;
-
-import org.springframework.data.cassandra.core.mapping.PrimaryKey;
-import org.springframework.data.cassandra.core.mapping.Table;
-
-@Table
 public class User {
-    @PrimaryKey
-    private UUID id;
+    private String id;
     private String name;
     private int age;
 
-    public User(UUID id, String name, int age){
+    public User(String id, String name, int age){
         this.id = id;
         this.name = name;
         this.age = age;
     }
 
-    public UUID getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(String id) {
         this.id = id;
     }
 

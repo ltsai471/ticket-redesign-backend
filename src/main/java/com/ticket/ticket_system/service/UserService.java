@@ -6,17 +6,8 @@ import com.ticket.ticket_system.utils.Names;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
-
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 public class UserService {
@@ -25,10 +16,10 @@ public class UserService {
 
     private final static Logger log = LoggerFactory.getLogger(UserService.class);
 
-    public String addUser(String name, int age) {
-        User user = new User(UUID.randomUUID(), name, age);
-        User savedUser = userRepository.save(user);
-        return String.format("save (%s, %s, %d)", savedUser.getId(), name, age);
+    public String addUser(String id, String name, int age) {
+        User user = new User(id, name, age);
+        userRepository.save(user);
+        return String.format("save (%s, %s, %d)", user.getId(), name, age);
     }
 
     public String getUser(String name) {
@@ -43,8 +34,10 @@ public class UserService {
 
     public String addDummyUsers() {
         try {
+            int id = 1;
             for (String name : Names.names) {
-                addUser(name, getRandomAge());
+                addUser("a_" + id, name, getRandomAge());
+                id++;
             }
             return "Done";
         } catch (Exception e) {

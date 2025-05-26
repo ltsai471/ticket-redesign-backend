@@ -28,16 +28,4 @@ public class TestController {
         return testService.hello(name);
     }
 
-    @Operation(summary = "addStudent")
-    @GetMapping("/addStudent")
-    public String addStudent(@RequestParam(value = "name") String name,
-                             @RequestParam(value = "age") int age) {
-        return testService.addStudent(name, age);
-    }
-
-    @Operation(summary = "getAllStudents")
-    @GetMapping("/getAllStudents")
-    public String getAllStudents() {
-        return testService.getAllStudents();
-    }
 }

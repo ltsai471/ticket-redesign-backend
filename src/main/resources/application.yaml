@@ -5,6 +5,16 @@ spring:
     active: prod
   server:
     port: 8080
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/ticket_system?useSSL=false&serverTimezone=UTC
+    username: root
+    password: 1234
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.ticket.ticket_system.entity
+  configuration:
+    map-underscore-to-camel-case: true
 management:
   server:
     port: 8081
@@ -26,7 +36,7 @@ management:
       prometheus:
         enabled: true
   health:
-    cassandra:
+    db:
       enabled: true
   logging:
     level:

@@ -1,21 +1,15 @@
 package com.ticket.ticket_system.entity;
 
-import org.springframework.data.cassandra.core.mapping.PrimaryKey;
-import org.springframework.data.cassandra.core.mapping.Table;
-
 import java.util.Date;
-import java.util.UUID;
 
-@Table
 public class Ticket {
-    @PrimaryKey
-    private UUID id;
+    private String id;
     private String userId;
     private String seatId;
     private boolean paid;
     private Date creationDate;
 
-    public Ticket(UUID id, String userId, String seatId, boolean paid, Date creationDate) {
+    public Ticket(String id, String userId, String seatId, boolean paid, Date creationDate) {
         this.id = id;
         this.userId = userId;
         this.seatId = seatId;
@@ -23,11 +17,11 @@ public class Ticket {
         this.creationDate = creationDate;
     }
 
-    public UUID getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(String id) {
         this.id = id;
     }
 

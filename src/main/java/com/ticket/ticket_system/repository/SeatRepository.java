@@ -1,17 +1,26 @@
 package com.ticket.ticket_system.repository;
 
 import com.ticket.ticket_system.entity.Seat;
-import com.ticket.ticket_system.entity.SeatKey;
-import org.springframework.data.repository.CrudRepository;
+import org.apache.ibatis.annotations.*;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
-public interface SeatRepository extends CrudRepository<Seat, SeatKey> {
-    Optional<Seat> findById(UUID id);
+@Mapper
+public interface SeatRepository {
+    @Select("SELECT * FROM seat WHERE id = #{id}")
+    Optional<Seat> findById(String id);
 
-    //    Optional<Seat> findById(UUID id);
-//    Seat findByCampaignIdAndAreaAndRowAndColumn(String campaignId, String area, int row, int column);
-    Optional<Seat> findByKey(SeatKey key);
+    @Select("SELECT * FROM seat WHERE campaign_id = #{campaignId} AND area = #{area} AND row = #{row} AND column = #{column}")
+    Optional<Seat> findByKey(@Param("campaignId") String campaignId, 
+                           @Param("area") String area, 
+                           @Param("row") int row, 
+                           @Param("column") int column);
+
+    @Insert("INSERT INTO seat (id, campaign_id, area, row, column, price, status) " +
+            "VALUES (#{id}, #{campaignId}, #{area}, #{row}, #{column}, #{price}, #{status})")
+    @Options(useGeneratedKeys = true, keyProperty = "id")
+    void save(Seat seat);
+
+    @Update("UPDATE seat SET status = #{status} WHERE id = #{id}")
+    void updateStatus(@Param("id") String id, @Param("status") String status);
 }

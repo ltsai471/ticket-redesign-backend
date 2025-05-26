@@ -34,9 +34,4 @@ public class OperateController {
         return userService.getUser(name);
     }
 
-//
-//    @GetMapping("/getAllStudents")
-//    public String getAllStudents() {
-//        return testService.getAllStudents();
-//    }
 }

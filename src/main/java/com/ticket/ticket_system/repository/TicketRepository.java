@@ -1,14 +1,24 @@
 package com.ticket.ticket_system.repository;
 
 import com.ticket.ticket_system.entity.Ticket;
-import org.springframework.data.repository.CrudRepository;
+import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
-public interface TicketRepository extends CrudRepository<Ticket, UUID> {
-    Optional<Ticket> findById(UUID id);
+@Mapper
+public interface TicketRepository {
+    @Select("SELECT * FROM ticket WHERE id = #{id}")
+    Optional<Ticket> findById(String id);
+
+    @Select("SELECT * FROM ticket WHERE paid = #{paid}")
     List<Ticket> findByPaid(boolean paid);
-//    Optional<Ticket> findByName(String name);
+
+    @Insert("INSERT INTO ticket (id, user_id, seat_id, paid, creation_date) " +
+            "VALUES (#{id}, #{userId}, #{seatId}, #{paid}, #{creationDate})")
+    @Options(useGeneratedKeys = true, keyProperty = "id")
+    void save(Ticket ticket);
+
+    @Update("UPDATE ticket SET paid = #{paid} WHERE id = #{id}")
+    void updatePaidStatus(@Param("id") String id, @Param("paid") boolean paid);
 }

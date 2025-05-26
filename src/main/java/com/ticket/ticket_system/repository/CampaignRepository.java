@@ -1,12 +1,19 @@
 package com.ticket.ticket_system.repository;
 
 import com.ticket.ticket_system.entity.Campaign;
-import org.springframework.data.repository.CrudRepository;
+import org.apache.ibatis.annotations.*;
 
 import java.util.Optional;
-import java.util.UUID;
 
-public interface CampaignRepository extends CrudRepository<Campaign, UUID> {
-    Optional<Campaign> findById(UUID id);
+@Mapper
+public interface CampaignRepository {
+    @Select("SELECT * FROM campaign WHERE id = #{id}")
+    Optional<Campaign> findById(String id);
+
+    @Select("SELECT * FROM campaign WHERE name = #{name}")
     Campaign findByName(String name);
+
+    @Insert("INSERT INTO campaign (id, name) VALUES (#{id}, #{name})")
+    @Options(useGeneratedKeys = true, keyProperty = "id")
+    void save(Campaign campaign);
 }

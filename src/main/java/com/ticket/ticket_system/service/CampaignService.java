@@ -7,9 +7,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-import java.util.UUID;
-
 @Service
 public class CampaignService {
     @Autowired
@@ -18,10 +15,10 @@ public class CampaignService {
     private final static Logger log = LoggerFactory.getLogger(CampaignService.class);
 
     public String addCampaign(String name) {
-        Campaign campaign = new Campaign(UUID.randomUUID(), name);
-        Campaign savedCampaign = campaignRepository.save(campaign);
-        log.info("Campaign: {}", savedCampaign.getId());
-        return String.format("save (%s, %s)", savedCampaign.getId(), name);
+        Campaign campaign = new Campaign("id", name);
+        campaignRepository.save(campaign);
+        log.info("Campaign: {}", campaign.getId());
+        return String.format("save (%s, %s)", campaign.getId(), name);
     }
 
     public String getCampaign(String name) {
@@ -33,7 +30,6 @@ public class CampaignService {
         }
         return result.toString();
     }
-
 }
 
 

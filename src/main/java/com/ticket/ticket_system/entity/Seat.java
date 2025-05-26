@@ -1,37 +1,56 @@
 package com.ticket.ticket_system.entity;
 
-import org.springframework.data.cassandra.core.mapping.Column;
-import org.springframework.data.cassandra.core.mapping.PrimaryKey;
-import org.springframework.data.cassandra.core.mapping.Table;
 
-import java.util.UUID;
-
-@Table("seat")
 public class Seat {
-
-    @PrimaryKey
-    private SeatKey key;
-    @Column(value = "price")
+    private String campaignId;
+    private String area;
+    private int row;
+    private int column;
     private int price;
-    @Column(value = "status")
     private String status;
-    @Column(value = "id")
-    private UUID id;
+    private String id;
 
-    public Seat(SeatKey key, int price, String status, UUID id) {
-        this.key = key;
+    public Seat(String campaignId, String area, int row, int column, int price, String status, String id) {
+        this.campaignId = campaignId;
+        this.area = area;
+        this.row = row;
+        this.column = column;
         this.price = price;
         this.status = status;
         this.id = id;
     }
 
     // Getters and Setters
-    public SeatKey getKey() {
-        return key;
+    public String getCampaignId() {
+        return campaignId;
     }
 
-    public void setKey(SeatKey key) {
-        this.key = key;
+    public void setCampaignId(String campaignId) {
+        this.campaignId = campaignId;
+    }
+
+    public String getArea() {
+        return area;
+    }
+
+    public void setArea(String area) {
+        this.area = area;
+    }
+
+    public int getRow() {
+        return row;
+    }
+
+    public void setRow(int row) {
+        this.row = row;
+    }
+
+    public int getColumn() {
+        return column;
+    }
+
+    public void setColumn(int column) {
+        this.column = column;
     }
 
     public int getPrice() {
@@ -50,11 +69,11 @@ public class Seat {
         this.status = status;
     }
 
-    public UUID getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(String id) {
         this.id = id;
     }
 }
