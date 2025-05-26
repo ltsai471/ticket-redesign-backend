@@ -112,32 +112,60 @@ document.addEventListener('DOMContentLoaded', function() {
             seatId: selectedSeat.dataset.id
         };
 
-        // Disable button and show loading state
-        nextButton.disabled = true;
-        nextButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...';
-        
-        // Call buyTicket API
-        fetch(`/oper/buyTicket?userId=${userId}&campaignId=${campaignId}&area=${seatData.area}&row=${seatData.row}&column=${seatData.column}`)
-            .then(response => response.text())
-            .then(result => {
-                if (result.startsWith('error')) {
-                    throw new Error(result);
-                }
-                // Redirect to success page with ticket details
-                const seatInfo = `Area ${seatData.area}, Row ${seatData.row}, Column ${seatData.column}`;
-                window.location.href = `/ticket/success?ticketId=${result}&seatInfo=${encodeURIComponent(seatInfo)}`;
+        buyTicket(seatData);
+    });
+});
+
+async function buyTicket(seatData) {
+    const nextButton = document.getElementById('nextButton');
+    nextButton.disabled = true;
+    nextButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...';
+
+    try {
+        const response = await fetch('/oper/buyTicket', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                userId: 1, // TODO: Get from session
+                campaignId: 1, // TODO: Get from URL or session
+                area: seatData.area,
+                row: seatData.row,
+                column: seatData.column
             })
-            .catch(error => {
-                console.error('Error purchasing ticket:', error);
-                // Show error message
-                const errorAlert = document.createElement('div');
-                errorAlert.className = 'alert alert-danger mt-3';
-                errorAlert.textContent = `Error: ${error.message}`;
-                seatMap.insertAdjacentElement('afterend', errorAlert);
-                
-                // Reset button
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            if (data.error === 'SEAT_ALREADY_RESERVED') {
+                window.location.href = '/ticket/sorry';
+            }else{
+                const seatInfo = `Area ${seatData.area}, Row ${seatData.row}, Column ${seatData.column}`;
+                window.location.href = `/ticket/success?ticketId=${data.ticketId}&seatInfo=${encodeURIComponent(seatInfo)}`;
+            }
+        } else {
+            if (data.error === 'SEAT_ALREADY_RESERVED') {
+                // Redirect to sorry page if seat is already reserved
+                window.location.href = '/ticket/sorry';
+            } else {
+                // Show error message for other errors
+                const alertDiv = document.createElement('div');
+                alertDiv.className = 'alert alert-danger mt-3';
+                alertDiv.textContent = data.message || 'Failed to purchase ticket. Please try again.';
+                document.querySelector('.container').appendChild(alertDiv);
                 nextButton.disabled = false;
                 nextButton.textContent = 'Next';
-            });
-    });
-}); 
+            }
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        const alertDiv = document.createElement('div');
+        alertDiv.className = 'alert alert-danger mt-3';
+        alertDiv.textContent = 'An error occurred. Please try again.';
+        document.querySelector('.container').appendChild(alertDiv);
+        nextButton.disabled = false;
+        nextButton.textContent = 'Next';
+    }
+} 

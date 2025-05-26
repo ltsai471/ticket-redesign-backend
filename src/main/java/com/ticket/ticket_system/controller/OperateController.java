@@ -2,10 +2,7 @@ package com.ticket.ticket_system.controller;
 
 import com.ticket.ticket_system.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/oper")
@@ -15,13 +12,10 @@ public class OperateController {
     @Autowired
     UserService userService;
 
-    @GetMapping("/buyTicket")
-    public String buyTicket(@RequestParam(value = "userId") Long userId,
-                            @RequestParam(value = "campaignId") Long campaignId,
-                            @RequestParam(value = "area") String area,
-                            @RequestParam(value = "row") int row,
-                            @RequestParam(value = "column") int column) {
-        return ticketService.addTicket(userId, campaignId, area, row, column);
+    @PostMapping("/buyTicket")
+    public String buyTicket(@RequestBody TicketRequest request) {
+        return ticketService.addTicket(request.getUserId(), request.getCampaignId(), 
+                                     request.getArea(), request.getRow(), request.getColumn());
     }
 
     @GetMapping("/payTicket")
@@ -34,4 +28,24 @@ public class OperateController {
         return userService.getUser(name);
     }
 
+}
+
+class TicketRequest {
+    private Long userId;
+    private Long campaignId;
+    private String area;
+    private int row;
+    private int column;
+
+    // Getters and Setters
+    public Long getUserId() { return userId; }
+    public void setUserId(Long userId) { this.userId = userId; }
+    public Long getCampaignId() { return campaignId; }
+    public void setCampaignId(Long campaignId) { this.campaignId = campaignId; }
+    public String getArea() { return area; }
+    public void setArea(String area) { this.area = area; }
+    public int getRow() { return row; }
+    public void setRow(int row) { this.row = row; }
+    public int getColumn() { return column; }
+    public void setColumn(int column) { this.column = column; }
 }
