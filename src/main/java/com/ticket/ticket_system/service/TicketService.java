@@ -24,30 +24,30 @@ public class TicketService {
 
     private final static Logger log = LoggerFactory.getLogger(TicketService.class);
 
-    public String addTicket(String userId, String campaignName, String area, int row, int column) {
+    public String addTicket(Long userId, String campaignName, String area, int row, int column) {
         try {
             log.info("campaignRepository.findByName");
             Campaign campaign = campaignRepository.findByName(campaignName);
             if (campaign == null) return "error: no campaign";
 
             log.info("seatRepository.findByKey");
-            String campaignId = String.valueOf(campaign.getId());
+            Long campaignId = campaign.getId();
             Optional<Seat> seat = seatRepository.findByKey(campaignId, area, row, column);
             if (!seat.isPresent()) return "error: no seat";
 
             log.info("ticketRepository.save");
-            String seatId = String.valueOf(seat.get().getId());
-            Ticket ticket = new Ticket("id", userId, seatId, false, new Date());
+            Long seatId = seat.get().getId();
+            Ticket ticket = new Ticket(null, userId, seatId, false, new Date());
             ticketRepository.save(ticket);
             seatRepository.updateStatus(seat.get().getId(), "occupied");
-            return String.format("save (%s)", ticket.getId());
+            return String.format("save (%d)", ticket.getId());
         } catch (Exception e) {
             log.error(e.getMessage());
             return "error";
         }
     }
 
-    public String getTicket(String id) {
+    public String getTicket(Long id) {
         StringBuilder result = new StringBuilder();
         Optional<Ticket> ticket = ticketRepository.findById(id);
         if (ticket.isPresent()) {
@@ -57,7 +57,7 @@ public class TicketService {
         return result.toString();
     }
 
-    public String payTicket(String id) {
+    public String payTicket(Long id) {
         try {
             StringBuilder result = new StringBuilder();
             Optional<Ticket> ticket = ticketRepository.findById(id);
@@ -75,11 +75,10 @@ public class TicketService {
         }
     }
 
-    public String releaseTicket(String id) {
+    public String releaseTicket(Long id) {
         try {
             //check paid or not
             List<Ticket> unpaidTickets = ticketRepository.findByPaid(false);
-//            List<Seat> updateSeat = new ArrayList<>();
             for (Ticket ticket : unpaidTickets) {
                 Date date = ticket.getCreationDate();
                 Calendar cal = Calendar.getInstance();
@@ -91,8 +90,6 @@ public class TicketService {
                     seatRepository.save(seat.get());
                 }
             }
-//            seatRepository.saveAll(updateSeat);
-//            return "Release " + updateSeat.size() + " tickets.";
             return "saved.";
         } catch (Exception e) {
             log.error("releaseTicket", e.getMessage());
@@ -100,7 +97,7 @@ public class TicketService {
         }
     }
 
-    private void updateSeatStatus(String seatId, String status) {
+    private void updateSeatStatus(Long seatId, String status) {
         log.info("updateSeatStatus:" + seatId + "->" + status);
         Optional<Seat> seat = seatRepository.findById(seatId);
         if (seat.isPresent()) {

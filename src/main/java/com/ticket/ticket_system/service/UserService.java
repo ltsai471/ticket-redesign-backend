@@ -16,10 +16,10 @@ public class UserService {
 
     private final static Logger log = LoggerFactory.getLogger(UserService.class);
 
-    public String addUser(String id, String name, int age) {
-        User user = new User(id, name, age);
+    public String addUser(String name, int age) {
+        User user = new User(null, name, age);
         userRepository.save(user);
-        return String.format("save (%s, %s, %d)", user.getId(), name, age);
+        return String.format("save (%d, %s, %d)", user.getId(), name, age);
     }
 
     public String getUser(String name) {
@@ -34,10 +34,8 @@ public class UserService {
 
     public String addDummyUsers() {
         try {
-            int id = 1;
             for (String name : Names.names) {
-                addUser("a_" + id, name, getRandomAge());
-                id++;
+                addUser(name, getRandomAge());
             }
             return "Done";
         } catch (Exception e) {

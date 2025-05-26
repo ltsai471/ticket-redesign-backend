@@ -1,16 +1,15 @@
 package com.ticket.ticket_system.entity;
 
-
 public class Seat {
-    private String campaignId;
+    private Long campaignId;
     private String area;
     private int row;
     private int column;
     private int price;
     private String status;
-    private String id;
+    private Long id;
 
-    public Seat(String campaignId, String area, int row, int column, int price, String status, String id) {
+    public Seat(Long campaignId, String area, int row, int column, int price, String status, Long id) {
         this.campaignId = campaignId;
         this.area = area;
         this.row = row;
@@ -21,11 +20,11 @@ public class Seat {
     }
 
     // Getters and Setters
-    public String getCampaignId() {
+    public Long getCampaignId() {
         return campaignId;
     }
 
-    public void setCampaignId(String campaignId) {
+    public void setCampaignId(Long campaignId) {
         this.campaignId = campaignId;
     }
 
@@ -69,11 +68,11 @@ public class Seat {
         this.status = status;
     }
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 }

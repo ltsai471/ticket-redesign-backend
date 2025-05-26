@@ -29,7 +29,7 @@ public class SetupController {
     }
 
     @GetMapping("/addSeatsByCampaign")
-    public String addSeatsByCampaign(@RequestParam(value = "campaignId") String campaignId) {
+    public String addSeatsByCampaign(@RequestParam(value = "campaignId") Long campaignId) {
         try {
             seatService.addSeats("A", 10, 10, 8000, campaignId);
             seatService.addSeats("B", 100, 100, 4000, campaignId);
@@ -45,7 +45,7 @@ public class SetupController {
                                  @RequestParam(value = "rowNum") int rowNum,
                                  @RequestParam(value = "columnNum") int columnNum,
                                  @RequestParam(value = "price") int price,
-                                 @RequestParam(value = "campaignId") String campaignId) {
+                                 @RequestParam(value = "campaignId") Long campaignId) {
         try {
             seatService.addSeats(area, rowNum, columnNum, price, campaignId);
             return "Done";

@@ -8,13 +8,12 @@ import java.util.Optional;
 @Mapper
 public interface UserRepository {
     @Select("SELECT * FROM user WHERE id = #{id}")
-    Optional<User> findById(String id);
+    Optional<User> findById(Long id);
 
     @Select("SELECT * FROM user WHERE name = #{name}")
     Optional<User> findByName(String name);
 
-    @Insert("INSERT INTO user (id, name, age) " +
-            "VALUES (#{id}, #{name}, #{age})")
+    @Insert("INSERT INTO user (name, age) VALUES (#{name}, #{age})")
     @Options(useGeneratedKeys = true, keyProperty = "id")
     void save(User user);
 }

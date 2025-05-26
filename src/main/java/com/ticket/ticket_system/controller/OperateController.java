@@ -16,7 +16,7 @@ public class OperateController {
     UserService userService;
 
     @GetMapping("/buyTicket")
-    public String buyTicket(@RequestParam(value = "userId") String userId,
+    public String buyTicket(@RequestParam(value = "userId") Long userId,
                             @RequestParam(value = "campaignName") String campaignName,
                             @RequestParam(value = "area") String area,
                             @RequestParam(value = "row") int row,
@@ -25,7 +25,7 @@ public class OperateController {
     }
 
     @GetMapping("/payTicket")
-    public String payTicket(@RequestParam(value = "id") String id) {
+    public String payTicket(@RequestParam(value = "id") Long id) {
         return ticketService.payTicket(id);
     }
 

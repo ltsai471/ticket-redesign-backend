@@ -9,16 +9,16 @@ import java.util.Optional;
 @Mapper
 public interface TicketRepository {
     @Select("SELECT * FROM ticket WHERE id = #{id}")
-    Optional<Ticket> findById(String id);
+    Optional<Ticket> findById(Long id);
 
     @Select("SELECT * FROM ticket WHERE paid = #{paid}")
     List<Ticket> findByPaid(boolean paid);
 
-    @Insert("INSERT INTO ticket (id, user_id, seat_id, paid, creation_date) " +
-            "VALUES (#{id}, #{userId}, #{seatId}, #{paid}, #{creationDate})")
+    @Insert("INSERT INTO ticket (user_id, seat_id, paid, creation_date) " +
+            "VALUES (#{userId}, #{seatId}, #{paid}, #{creationDate})")
     @Options(useGeneratedKeys = true, keyProperty = "id")
     void save(Ticket ticket);
 
     @Update("UPDATE ticket SET paid = #{paid} WHERE id = #{id}")
-    void updatePaidStatus(@Param("id") String id, @Param("paid") boolean paid);
+    void updatePaidStatus(@Param("id") Long id, @Param("paid") boolean paid);
 }

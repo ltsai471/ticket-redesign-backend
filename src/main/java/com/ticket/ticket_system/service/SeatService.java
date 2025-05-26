@@ -14,19 +14,19 @@ public class SeatService {
 
     private final static Logger log = LoggerFactory.getLogger(SeatService.class);
 
-    public void addSeat(String area, int row, int column, int price, String campaignId) throws Exception {
+    public void addSeat(String area, int row, int column, int price, Long campaignId) throws Exception {
         try {
-            log.info(campaignId);
-            Seat seat = new Seat(campaignId, area, row, column, price, "absent", "id");
+            log.info(campaignId.toString());
+            Seat seat = new Seat(campaignId, area, row, column, price, "absent", null);
             seatRepository.save(seat);
-            log.info("addSeat", String.format("save (%s, %s, %d)", seat.getId(), area, row));
+            log.info("addSeat", String.format("save (%d, %s, %d)", seat.getId(), area, row));
         } catch (Exception e) {
             log.error(e.getMessage());
             throw new Exception(e.getMessage());
         }
     }
 
-    public void addSeats(String area, int rowNum, int columnNum, int price, String campaignId) throws Exception {
+    public void addSeats(String area, int rowNum, int columnNum, int price, Long campaignId) throws Exception {
         log.error("addSeats", area + ";" + rowNum + ";" + columnNum + ";" + price + ";" + campaignId);
         try {
             for (int rowId = 1; rowId <= rowNum; rowId++) {
