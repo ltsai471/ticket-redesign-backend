@@ -45,6 +45,11 @@ public class SeatService {
             throw new Exception("addSeats failed: " + e.getMessage());
         }
     }
+
+    public List<Seat> getSeatsByArea(Long campaignId, String area) {
+        log.info("Getting seats for campaign {} and area {}", campaignId, area);
+        return seatRepository.findByCampaignAndArea(campaignId, area);
+    }
 }
 
 

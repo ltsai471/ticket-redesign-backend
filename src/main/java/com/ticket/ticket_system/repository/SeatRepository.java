@@ -32,4 +32,7 @@ public interface SeatRepository {
 
     @Update("UPDATE seat SET status = #{status} WHERE id = #{id}")
     void updateStatus(@Param("id") Long id, @Param("status") String status);
+
+    @Select("SELECT * FROM seat WHERE campaign_id = #{campaignId} AND area = #{area} ORDER BY seat_row, seat_column")
+    List<Seat> findByCampaignAndArea(@Param("campaignId") Long campaignId, @Param("area") String area);
 }
