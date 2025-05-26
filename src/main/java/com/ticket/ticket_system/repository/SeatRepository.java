@@ -3,6 +3,7 @@ package com.ticket.ticket_system.repository;
 import com.ticket.ticket_system.entity.Seat;
 import org.apache.ibatis.annotations.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @Mapper
@@ -20,6 +21,14 @@ public interface SeatRepository {
             "VALUES (#{campaignId}, #{area}, #{seat_row}, #{seat_column}, #{price}, #{status})")
     @Options(useGeneratedKeys = true, keyProperty = "id")
     void save(Seat seat);
+
+    @Insert("<script>" +
+            "INSERT INTO seat (campaign_id, area, seat_row, seat_column, price, status) VALUES " +
+            "<foreach collection='seats' item='seat' separator=','>" +
+            "(#{seat.campaignId}, #{seat.area}, #{seat.seat_row}, #{seat.seat_column}, #{seat.price}, #{seat.status})" +
+            "</foreach>" +
+            "</script>")
+    void batchSave(@Param("seats") List<Seat> seats);
 
     @Update("UPDATE seat SET status = #{status} WHERE id = #{id}")
     void updateStatus(@Param("id") Long id, @Param("status") String status);

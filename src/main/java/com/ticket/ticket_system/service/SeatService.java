@@ -7,6 +7,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 public class SeatService {
     @Autowired
@@ -16,7 +19,6 @@ public class SeatService {
 
     public void addSeat(String area, int row, int column, int price, Long campaignId) throws Exception {
         try {
-            log.info(campaignId.toString());
             Seat seat = new Seat(campaignId, area, row, column, price, "absent", null);
             seatRepository.save(seat);
             log.info("addSeat", String.format("save (%d, %s, %d)", seat.getId(), area, row));
@@ -27,19 +29,22 @@ public class SeatService {
     }
 
     public void addSeats(String area, int rowNum, int columnNum, int price, Long campaignId) throws Exception {
-        log.error("addSeats", area + ";" + rowNum + ";" + columnNum + ";" + price + ";" + campaignId);
+        log.info("addSeats: area={}, rowNum={}, columnNum={}, price={}, campaignId={}", 
+                area, rowNum, columnNum, price, campaignId);
         try {
+            List<Seat> seats = new ArrayList<>();
             for (int rowId = 1; rowId <= rowNum; rowId++) {
                 for (int colId = 1; colId <= columnNum; colId++) {
-                    addSeat(area, rowId, colId, price, campaignId);
+                    seats.add(new Seat(campaignId, area, rowId, colId, price, "absent", null));
                 }
             }
+            seatRepository.batchSave(seats);
+            log.info("Successfully added {} seats", seats.size());
         } catch (Exception e) {
-            log.error("addSeats", e.getMessage());
-            throw new Exception("addSeats" + e.getMessage());
+            log.error("addSeats failed: {}", e.getMessage());
+            throw new Exception("addSeats failed: " + e.getMessage());
         }
     }
-
 }
 
 
