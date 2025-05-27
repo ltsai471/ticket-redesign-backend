@@ -53,42 +53,6 @@ public class TicketService {
         return result.toString();
     }
 
-    public String payTicket(Long id) {
-        try {
-            Optional<Ticket> ticket = ticketRepository.findById(id);
-            if (ticket.isPresent()) {
-                seatRepository.updateStatus(ticket.get().getSeatId(), "paying");
-                
-                // Simulate calling 3rd party payment API with 5 second delay
-                try {
-                    Thread.sleep(5000);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    throw new Exception("Payment process interrupted");
-                }
-                
-                // Simulate random payment success/failure (30% chance of failure)
-                Random random = new Random();
-                boolean paymentSuccess = random.nextDouble() > 0.2;
-                
-                if (paymentSuccess) {
-                    ticketRepository.updatePaidStatus(ticket.get().getId(), true);
-                    seatRepository.updateStatus(ticket.get().getSeatId(), "sold");
-                    return "{\"status\": \"SUCCESS\", \"message\": \"Payment successful\"}";
-                } else {
-                    // Handle failed payment
-                    seatRepository.updateStatus(ticket.get().getSeatId(), "reserved");
-                    return "{\"status\": \"FAILED\", \"message\": \"Payment failed. Please try again.\"}";
-                }
-            } else {
-                throw new Exception("Error. Ticket#" + id + " is not found.");
-            }
-        } catch (Exception e) {
-            log.error("payTicket", e.getMessage());
-            return "{\"status\": \"ERROR\", \"message\": \"" + e.getMessage() + "\"}";
-        }
-    }
-
     public String releaseTicket() {
         try {
             // Get all unpaid tickets

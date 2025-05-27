@@ -15,6 +15,8 @@ public class OperateController {
     TicketPurchaseProducer ticketPurchaseProducer;
     @Autowired
     TicketPurchaseStatusService ticketPurchaseStatusService;
+    @Autowired
+    PaymentService paymentService;
 
     @PostMapping("/buyTicket")
     public String buyTicket(@RequestBody TicketRequest request) {
@@ -29,7 +31,7 @@ public class OperateController {
 
     @GetMapping("/payTicket")
     public String payTicket(@RequestParam(value = "id") Long id) {
-        return ticketService.payTicket(id);
+        return paymentService.payTicket(id);
     }
 
     @GetMapping("/getUser")
