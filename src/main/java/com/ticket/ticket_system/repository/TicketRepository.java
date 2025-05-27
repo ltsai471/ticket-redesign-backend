@@ -17,7 +17,7 @@ public interface TicketRepository {
     @Insert("INSERT INTO ticket (user_id, seat_id, paid, creation_date) " +
             "VALUES (#{userId}, #{seatId}, #{paid}, #{creationDate})")
     @Options(useGeneratedKeys = true, keyProperty = "id")
-    void save(Ticket ticket);
+    void create(Ticket ticket);
 
     @Update("UPDATE ticket SET paid = #{paid} WHERE id = #{id}")
     void updatePaidStatus(@Param("id") Long id, @Param("paid") boolean paid);

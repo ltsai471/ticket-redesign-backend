@@ -23,8 +23,7 @@ public class SeatService {
     public void addSeat(String area, int row, int column, int price, Long campaignId) throws Exception {
         try {
             Seat seat = new Seat(campaignId, area, row, column, price, "available", null);
-            seatRepository.save(seat);
-            // Invalidate cache for this area
+            seatRepository.create(seat);
             seatCacheService.clearSeatCacheByCampaignIdAndArea(campaignId, area);
             log.info("addSeat", String.format("save (%d, %s, %d)", seat.getId(), area, row));
         } catch (Exception e) {
@@ -43,7 +42,7 @@ public class SeatService {
                     seats.add(new Seat(campaignId, area, rowId, colId, price, "available", null));
                 }
             }
-            seatRepository.batchSave(seats);
+            seatRepository.batchCreate(seats);
             // Invalidate cache for this area
             seatCacheService.clearSeatCacheByCampaignIdAndArea(campaignId, area);
             log.info("Successfully added {} seats", seats.size());

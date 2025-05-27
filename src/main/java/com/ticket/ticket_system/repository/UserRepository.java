@@ -15,6 +15,6 @@ public interface UserRepository {
 
     @Insert("INSERT INTO user (name, age) VALUES (#{name}, #{age})")
     @Options(useGeneratedKeys = true, keyProperty = "id")
-    void save(User user);
+    void create(User user);
 }
 

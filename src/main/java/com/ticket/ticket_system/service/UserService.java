@@ -18,7 +18,7 @@ public class UserService {
 
     public String addUser(String name, int age) {
         User user = new User(null, name, age);
-        userRepository.save(user);
+        userRepository.create(user);
         return String.format("save (%d, %s, %d)", user.getId(), name, age);
     }
 

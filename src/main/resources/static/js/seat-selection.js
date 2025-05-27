@@ -148,10 +148,6 @@ async function buyTicket(seatData) {
             // Start polling for status if we have a requestId
             if (data.requestId) {
                 await pollPurchaseStatus(data.requestId, seatData);
-            } else if (data.ticketId) {
-                // Handle immediate success (if not using async processing)
-                const seatInfo = `Area ${seatData.area}, Row ${seatData.row}, Column ${seatData.column}`;
-                window.location.href = `/ticket/success?ticketId=${data.ticketId}&seatInfo=${encodeURIComponent(seatInfo)}`;
             }
         } else {
             handleError(data);
@@ -169,7 +165,6 @@ async function pollPurchaseStatus(requestId, seatData) {
     const poll = async () => {
         try {
             const response = await fetch(`/oper/getPurchaseStatus?requestId=${requestId}`);
-//            const response = await fetch(`/api/tickets/purchase/status/${requestId}`);
             const data = await response.json();
 
             if (response.ok) {
@@ -178,8 +173,15 @@ async function pollPurchaseStatus(requestId, seatData) {
                         if (data.error === 'SEAT_ALREADY_RESERVED') {
                             window.location.href = '/ticket/sorry';
                         } else {
-                            const seatInfo = `Area ${seatData.area}, Row ${seatData.row}, Column ${seatData.column}`;
-                            window.location.href = `/ticket/success?ticketId=${data.ticketId}&seatInfo=${encodeURIComponent(seatInfo)}`;
+                            // Redirect to payment page with ticket information
+                            const paymentData = {
+                                ticketId: data.ticketId,
+                                seatInfo: `Area ${seatData.area}, Row ${seatData.row}, Column ${seatData.column}`,
+                                price: data.price
+                            };
+                            window.location.href = `/ticket/payment?${new URLSearchParams(paymentData).toString()}`;
+//                            const seatInfo = `Area ${seatData.area}, Row ${seatData.row}, Column ${seatData.column}`;
+//                            window.location.href = `/ticket/success?ticketId=${data.ticketId}&seatInfo=${encodeURIComponent(seatInfo)}`;
                         }
                         return;
                     case 'FAILED':
@@ -231,4 +233,4 @@ function handleError(data) {
         alertDiv.textContent = data.message || 'Failed to purchase ticket. Please try again.';
         document.querySelector('.container').appendChild(alertDiv);
     }
-} 
+}

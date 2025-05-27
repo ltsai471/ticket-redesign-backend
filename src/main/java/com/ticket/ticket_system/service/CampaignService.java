@@ -16,7 +16,7 @@ public class CampaignService {
 
     public String addCampaign(String name) {
         Campaign campaign = new Campaign(null, name);
-        campaignRepository.save(campaign);
+        campaignRepository.create(campaign);
         log.info("Campaign: {}", campaign.getId());
         return String.format("save (%d, %s)", campaign.getId(), name);
     }

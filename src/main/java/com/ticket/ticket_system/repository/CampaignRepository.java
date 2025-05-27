@@ -15,5 +15,5 @@ public interface CampaignRepository {
 
     @Insert("INSERT INTO campaign (name) VALUES (#{name})")
     @Options(useGeneratedKeys = true, keyProperty = "id")
-    void save(Campaign campaign);
+    void create(Campaign campaign);
 }

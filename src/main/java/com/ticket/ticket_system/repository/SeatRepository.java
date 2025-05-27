@@ -20,7 +20,7 @@ public interface SeatRepository {
     @Insert("INSERT INTO seat (campaign_id, area, seat_row, seat_column, price, status) " +
             "VALUES (#{campaignId}, #{area}, #{seatRow}, #{seatColumn}, #{price}, #{status})")
     @Options(useGeneratedKeys = true, keyProperty = "id")
-    void save(Seat seat);
+    void create(Seat seat);
 
     @Insert("<script>" +
             "INSERT INTO seat (campaign_id, area, seat_row, seat_column, price, status) VALUES " +
@@ -28,7 +28,7 @@ public interface SeatRepository {
             "(#{seat.campaignId}, #{seat.area}, #{seat.seatRow}, #{seat.seatColumn}, #{seat.price}, #{seat.status})" +
             "</foreach>" +
             "</script>")
-    void batchSave(@Param("seats") List<Seat> seats);
+    void batchCreate(@Param("seats") List<Seat> seats);
 
     @Update("UPDATE seat SET status = #{status} WHERE id = #{id}")
     void updateStatus(@Param("id") Long id, @Param("status") String status);

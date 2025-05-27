@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.Random;
 
 @Service
 public class TicketService {
@@ -33,7 +34,7 @@ public class TicketService {
             log.info("ticketRepository.save");
             Long seatId = seat.get().getId();
             Ticket ticket = new Ticket(null, userId, seatId, false, new Date());
-            ticketRepository.save(ticket);
+            ticketRepository.create(ticket);
             seatRepository.updateStatus(seat.get().getId(), "reserved");
             return String.format("{\"ticketId\": %d}", ticket.getId());
         } catch (Exception e) {
@@ -54,19 +55,37 @@ public class TicketService {
 
     public String payTicket(Long id) {
         try {
-            StringBuilder result = new StringBuilder();
             Optional<Ticket> ticket = ticketRepository.findById(id);
             if (ticket.isPresent()) {
-                ticket.get().setPaid(true);
-                ticketRepository.save(ticket.get());
-                updateSeatStatus(ticket.get().getSeatId(), "purchased");
+                seatRepository.updateStatus(ticket.get().getSeatId(), "paying");
+                
+                // Simulate calling 3rd party payment API with 5 second delay
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    throw new Exception("Payment process interrupted");
+                }
+                
+                // Simulate random payment success/failure (30% chance of failure)
+                Random random = new Random();
+                boolean paymentSuccess = random.nextDouble() > 0.2;
+                
+                if (paymentSuccess) {
+                    ticketRepository.updatePaidStatus(ticket.get().getId(), true);
+                    seatRepository.updateStatus(ticket.get().getSeatId(), "sold");
+                    return "{\"status\": \"SUCCESS\", \"message\": \"Payment successful\"}";
+                } else {
+                    // Handle failed payment
+                    seatRepository.updateStatus(ticket.get().getSeatId(), "reserved");
+                    return "{\"status\": \"FAILED\", \"message\": \"Payment failed. Please try again.\"}";
+                }
             } else {
                 throw new Exception("Error. Ticket#" + id + " is not found.");
             }
-            return result.toString();
         } catch (Exception e) {
             log.error("payTicket", e.getMessage());
-            return e.getMessage();
+            return "{\"status\": \"ERROR\", \"message\": \"" + e.getMessage() + "\"}";
         }
     }
 
@@ -82,7 +101,7 @@ public class TicketService {
                 if (cal.getTime().before(new Date())) {
                     Optional<Seat> seat = seatRepository.findById(ticket.getSeatId());
                     seat.get().setStatus("purchased");
-                    seatRepository.save(seat.get());
+                    seatRepository.create(seat.get());
                 }
             }
             return "saved.";
@@ -92,14 +111,6 @@ public class TicketService {
         }
     }
 
-    private void updateSeatStatus(Long seatId, String status) {
-        log.info("updateSeatStatus:" + seatId + "->" + status);
-        Optional<Seat> seat = seatRepository.findById(seatId);
-        if (seat.isPresent()) {
-            seat.get().setStatus(status);
-            seatRepository.save(seat.get());
-        }
-    }
 }
 
 
