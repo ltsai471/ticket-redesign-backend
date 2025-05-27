@@ -89,25 +89,35 @@ public class TicketService {
         }
     }
 
-    public String releaseTicket(Long id) {
+    public String releaseTicket() {
         try {
-            //check paid or not
+            // Get all unpaid tickets
             List<Ticket> unpaidTickets = ticketRepository.findByPaid(false);
+            Date currentTime = new Date();
+            
             for (Ticket ticket : unpaidTickets) {
-                Date date = ticket.getCreationDate();
+                // Calculate expiration time (10 minutes after creation)
                 Calendar cal = Calendar.getInstance();
-                cal.setTime(date);
+                cal.setTime(ticket.getCreationDate());
                 cal.add(Calendar.MINUTE, 10);
-                if (cal.getTime().before(new Date())) {
+                Date expirationTime = cal.getTime();
+                
+                // Check if ticket has expired
+                if (currentTime.after(expirationTime)) {
                     Optional<Seat> seat = seatRepository.findById(ticket.getSeatId());
-                    seat.get().setStatus("purchased");
-                    seatRepository.create(seat.get());
+                    if (seat.isPresent() && "reserved".equals(seat.get().getStatus())) {
+                        seatRepository.updateStatus(seat.get().getId(), "available");
+                        
+                        // Delete the expired ticket
+                        ticketRepository.updateCancelDate(ticket.getId());
+                        log.info("Released expired ticket {} and seat {}", ticket.getId(), seat.get().getId());
+                    }
                 }
             }
-            return "saved.";
+            return "Ticket release process completed successfully.";
         } catch (Exception e) {
-            log.error("releaseTicket", e.getMessage());
-            return e.getMessage();
+            log.error("Error in releaseTicket", e);
+            return "Error: " + e.getMessage();
         }
     }
 

@@ -8,6 +8,7 @@ public class Ticket {
     private Long seatId;
     private boolean paid;
     private Date creationDate;
+    private Date cancelDate;
 
     public Ticket(Long id, Long userId, Long seatId, boolean paid, Date creationDate) {
         this.id = id;
@@ -15,6 +16,7 @@ public class Ticket {
         this.seatId = seatId;
         this.paid = paid;
         this.creationDate = creationDate;
+        this.cancelDate = cancelDate;
     }
 
     public Long getId() {
@@ -55,5 +57,13 @@ public class Ticket {
 
     public void setCreationDate(Date creationDate) {
         this.creationDate = creationDate;
+    }
+
+    public Date getCancelDate() {
+        return cancelDate;
+    }
+
+    public void setCancelDate(Date cancelDate) {
+        this.cancelDate = cancelDate;
     }
 }

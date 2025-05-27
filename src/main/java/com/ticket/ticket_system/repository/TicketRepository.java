@@ -21,4 +21,7 @@ public interface TicketRepository {
 
     @Update("UPDATE ticket SET paid = #{paid} WHERE id = #{id}")
     void updatePaidStatus(@Param("id") Long id, @Param("paid") boolean paid);
+
+    @Update("UPDATE ticket SET cancel_date = NOW() WHERE id = #{id}")
+    void updateCancelDate(@Param("id") Long id);
 }
