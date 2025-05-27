@@ -14,10 +14,10 @@ document.addEventListener('DOMContentLoaded', function() {
         // Group seats by row
         const seatsByRow = {};
         seats.forEach(seat => {
-            if (!seatsByRow[seat.seat_row]) {
-                seatsByRow[seat.seat_row] = [];
+            if (!seatsByRow[seat.seatRow]) {
+                seatsByRow[seat.seatRow] = [];
             }
-            seatsByRow[seat.seat_row].push(seat);
+            seatsByRow[seat.seatRow].push(seat);
         });
 
         // Sort rows and create seat map
@@ -38,9 +38,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     const seatElement = document.createElement('div');
                     seatElement.className = `seat ${getSeatStatusClass(seat.status)}`;
                     seatElement.dataset.id = seat.id;
-                    seatElement.dataset.row = seat.seat_row;
-                    seatElement.dataset.column = seat.seat_column;
-                    seatElement.textContent = `${seat.seat_row}-${seat.seat_column}`;
+                    seatElement.dataset.row = seat.seatRow;
+                    seatElement.dataset.column = seat.seatColumn;
+                    seatElement.textContent = `${seat.seatRow}-${seat.seatColumn}`;
                     
                     if (seat.status === 'absent') {
                         seatElement.addEventListener('click', function() {

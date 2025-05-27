@@ -13,7 +13,10 @@ import java.util.List;
 @Service
 public class SeatService {
     @Autowired
-    SeatRepository seatRepository;
+    private SeatRepository seatRepository;
+    
+    @Autowired
+    private SeatCacheService seatCacheService;
 
     private final static Logger log = LoggerFactory.getLogger(SeatService.class);
 
@@ -21,6 +24,8 @@ public class SeatService {
         try {
             Seat seat = new Seat(campaignId, area, row, column, price, "absent", null);
             seatRepository.save(seat);
+            // Invalidate cache for this area
+            seatCacheService.clearSeatCacheByCampaignIdAndArea(campaignId, area);
             log.info("addSeat", String.format("save (%d, %s, %d)", seat.getId(), area, row));
         } catch (Exception e) {
             log.error(e.getMessage());
@@ -39,6 +44,8 @@ public class SeatService {
                 }
             }
             seatRepository.batchSave(seats);
+            // Invalidate cache for this area
+            seatCacheService.clearSeatCacheByCampaignIdAndArea(campaignId, area);
             log.info("Successfully added {} seats", seats.size());
         } catch (Exception e) {
             log.error("addSeats failed: {}", e.getMessage());
@@ -48,8 +55,33 @@ public class SeatService {
 
     public List<Seat> getSeatsByArea(Long campaignId, String area) {
         log.info("Getting seats for campaign {} and area {}", campaignId, area);
-        return seatRepository.findByCampaignAndArea(campaignId, area);
+
+        List<Seat> cachedSeats = seatCacheService.getSeatAvailability(campaignId, area);
+        if (cachedSeats != null) {
+            log.info("Cache hit for seats in area {}", area);
+            return cachedSeats;
+        }
+
+        List<Seat> seats = seatRepository.findByCampaignAndArea(campaignId, area);
+
+        if (seats != null && !seats.isEmpty()) {
+            seatCacheService.cacheSeatAvailability(campaignId, area, new ArrayList<>(seats));
+            log.info("Cached seats for area {}", area);
+        }
+        
+        return seats;
     }
+
+//    public void updateSeatStatus(Long campaignId, String area, Long seatId, String status) {
+//        // Update in database
+//        seatRepository.updateSeatStatus(seatId, status);
+//
+//        // Update in cache
+//        seatCacheService.updateSeatStatus(campaignId, area, seatId, status);
+//        log.info("Updated seat status: campaignId={}, area={}, seatId={}, status={}",
+//                campaignId, area, seatId, status);
+//    }
+
 }
 
 
