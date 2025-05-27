@@ -24,6 +24,21 @@ spring:
           max-idle: 8
           min-idle: 0
           max-wait: -1ms
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      group-id: ticket-purchase-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring:
+          json:
+            trusted:
+              packages: com.ticket.ticket_system.model
 mybatis:
   mapper-locations: classpath:mapper/*.xml
   type-aliases-package: com.ticket.ticket_system.entity

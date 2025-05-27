@@ -1,9 +1,7 @@
 package com.ticket.ticket_system.service;
 
-import com.ticket.ticket_system.entity.Campaign;
 import com.ticket.ticket_system.entity.Seat;
 import com.ticket.ticket_system.entity.Ticket;
-import com.ticket.ticket_system.repository.CampaignRepository;
 import com.ticket.ticket_system.repository.SeatRepository;
 import com.ticket.ticket_system.repository.TicketRepository;
 import org.slf4j.Logger;
@@ -19,8 +17,6 @@ public class TicketService {
     TicketRepository ticketRepository;
     @Autowired
     SeatRepository seatRepository;
-    @Autowired
-    CampaignRepository campaignRepository;
 
     private final static Logger log = LoggerFactory.getLogger(TicketService.class);
 

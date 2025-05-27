@@ -23,7 +23,6 @@ public class Seat {
 
     }
 
-    // Getters and Setters
     public Long getCampaignId() {
         return campaignId;
     }

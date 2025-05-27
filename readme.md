@@ -9,6 +9,7 @@ http://localhost:8080
 
 ## Docker Test
 //docker-compose up --build
+docker-compose down
 
 ## Redis Setup
 ```sh
@@ -18,6 +19,18 @@ docker exec -it redis-container redis-cli
 # Confirm Redis is Running
 redis-cli -h 127.0.0.1 -p 6379 ping
 
+# redis operate
+set mykey "hello"
+get mykey
+keys *
 ```
 
+## Kafka Setup
+```sh
+# setup
+docker-compose up --build
 
+```
+- Kafka UI
+  http://localhost:8082/
+- 

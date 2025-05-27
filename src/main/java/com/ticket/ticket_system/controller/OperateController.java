@@ -11,11 +11,15 @@ public class OperateController {
     TicketService ticketService;
     @Autowired
     UserService userService;
+    @Autowired
+    TicketPurchaseProducer ticketPurchaseProducer;
 
     @PostMapping("/buyTicket")
     public String buyTicket(@RequestBody TicketRequest request) {
-        return ticketService.addTicket(request.getUserId(), request.getCampaignId(), 
-                                     request.getArea(), request.getRow(), request.getColumn());
+//        return ticketService.addTicket(request.getUserId(), request.getCampaignId(),
+//                                     request.getArea(), request.getRow(), request.getColumn());
+        return ticketPurchaseProducer.produceTicketPurchase(request.getUserId(), request.getCampaignId(),
+                request.getArea(), request.getRow(), request.getColumn());
     }
 
     @GetMapping("/payTicket")
