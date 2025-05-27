@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     seatElement.dataset.column = seat.seatColumn;
                     seatElement.textContent = `${seat.seatRow}-${seat.seatColumn}`;
                     
-                    if (seat.status === 'absent') {
+                    if (seat.status === 'available') {
                         seatElement.addEventListener('click', function() {
                             if (this.classList.contains('unavailable')) return;
                             
@@ -72,9 +72,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function getSeatStatusClass(status) {
         switch (status) {
-            case 'absent':
+            case 'available':
                 return 'available';
-            case 'occupied':
+            case 'reserved':
             case 'purchased':
                 return 'unavailable';
             default:
@@ -122,6 +122,7 @@ async function buyTicket(seatData) {
     nextButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...';
 
     try {
+        // Initial purchase request
         const response = await fetch('/oper/buyTicket', {
             method: 'POST',
             headers: {
@@ -141,31 +142,93 @@ async function buyTicket(seatData) {
         if (response.ok) {
             if (data.error === 'SEAT_ALREADY_RESERVED') {
                 window.location.href = '/ticket/sorry';
-            }else{
+                return;
+            }
+
+            // Start polling for status if we have a requestId
+            if (data.requestId) {
+                await pollPurchaseStatus(data.requestId, seatData);
+            } else if (data.ticketId) {
+                // Handle immediate success (if not using async processing)
                 const seatInfo = `Area ${seatData.area}, Row ${seatData.row}, Column ${seatData.column}`;
                 window.location.href = `/ticket/success?ticketId=${data.ticketId}&seatInfo=${encodeURIComponent(seatInfo)}`;
             }
         } else {
-            if (data.error === 'SEAT_ALREADY_RESERVED') {
-                // Redirect to sorry page if seat is already reserved
-                window.location.href = '/ticket/sorry';
-            } else {
-                // Show error message for other errors
-                const alertDiv = document.createElement('div');
-                alertDiv.className = 'alert alert-danger mt-3';
-                alertDiv.textContent = data.message || 'Failed to purchase ticket. Please try again.';
-                document.querySelector('.container').appendChild(alertDiv);
-                nextButton.disabled = false;
-                nextButton.textContent = 'Next';
-            }
+            handleError(data);
         }
     } catch (error) {
         console.error('Error:', error);
+        handleError({ message: 'An error occurred. Please try again.' });
+    }
+}
+
+async function pollPurchaseStatus(requestId, seatData) {
+    const maxAttempts = 60; // 1 minute with 1-second intervals
+    let attempts = 0;
+
+    const poll = async () => {
+        try {
+            const response = await fetch(`/oper/getPurchaseStatus?requestId=${requestId}`);
+//            const response = await fetch(`/api/tickets/purchase/status/${requestId}`);
+            const data = await response.json();
+
+            if (response.ok) {
+                switch (data.status) {
+                    case 'COMPLETED':
+                        if (data.error === 'SEAT_ALREADY_RESERVED') {
+                            window.location.href = '/ticket/sorry';
+                        } else {
+                            const seatInfo = `Area ${seatData.area}, Row ${seatData.row}, Column ${seatData.column}`;
+                            window.location.href = `/ticket/success?ticketId=${data.ticketId}&seatInfo=${encodeURIComponent(seatInfo)}`;
+                        }
+                        return;
+                    case 'FAILED':
+                        handleError({ message: data.message || 'Purchase failed. Please try again.' });
+                        return;
+                    case 'PROCESSING':
+                        updateLoadingMessage('Processing your purchase...');
+                        break;
+                    case 'PENDING':
+                        updateLoadingMessage('Your request is in queue...');
+                        break;
+                }
+            } else {
+                handleError(data);
+                return;
+            }
+
+            attempts++;
+            if (attempts < maxAttempts) {
+                setTimeout(poll, 1000);
+            } else {
+                handleError({ message: 'Purchase request timed out. Please check your ticket status later.' });
+            }
+        } catch (error) {
+            console.error('Error polling status:', error);
+            handleError({ message: 'Error checking purchase status. Please try again.' });
+        }
+    };
+
+    // Start polling
+    await poll();
+}
+
+function updateLoadingMessage(message) {
+    const nextButton = document.getElementById('nextButton');
+    nextButton.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> ${message}`;
+}
+
+function handleError(data) {
+    const nextButton = document.getElementById('nextButton');
+    nextButton.disabled = false;
+    nextButton.textContent = 'Next';
+
+    if (data.error === 'SEAT_ALREADY_RESERVED') {
+        window.location.href = '/ticket/sorry';
+    } else {
         const alertDiv = document.createElement('div');
         alertDiv.className = 'alert alert-danger mt-3';
-        alertDiv.textContent = 'An error occurred. Please try again.';
+        alertDiv.textContent = data.message || 'Failed to purchase ticket. Please try again.';
         document.querySelector('.container').appendChild(alertDiv);
-        nextButton.disabled = false;
-        nextButton.textContent = 'Next';
     }
 } 

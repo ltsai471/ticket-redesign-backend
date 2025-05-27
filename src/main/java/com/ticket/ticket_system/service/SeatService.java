@@ -22,7 +22,7 @@ public class SeatService {
 
     public void addSeat(String area, int row, int column, int price, Long campaignId) throws Exception {
         try {
-            Seat seat = new Seat(campaignId, area, row, column, price, "absent", null);
+            Seat seat = new Seat(campaignId, area, row, column, price, "available", null);
             seatRepository.save(seat);
             // Invalidate cache for this area
             seatCacheService.clearSeatCacheByCampaignIdAndArea(campaignId, area);
@@ -40,7 +40,7 @@ public class SeatService {
             List<Seat> seats = new ArrayList<>();
             for (int rowId = 1; rowId <= rowNum; rowId++) {
                 for (int colId = 1; colId <= columnNum; colId++) {
-                    seats.add(new Seat(campaignId, area, rowId, colId, price, "absent", null));
+                    seats.add(new Seat(campaignId, area, rowId, colId, price, "available", null));
                 }
             }
             seatRepository.batchSave(seats);

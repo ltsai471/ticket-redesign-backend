@@ -13,15 +13,18 @@ public class TicketPurchaseProducer {
 
     @Autowired
     private KafkaTemplate<String, Object> kafkaTemplate;
+    @Autowired
+    private TicketPurchaseStatusService statusService;
 
     public String produceTicketPurchase(Long userId, Long campaignId, String area, int row, int column) {
         try {
+            String requestId = statusService.createPurchaseRequest(userId);
             TicketPurchaseRequest request = new TicketPurchaseRequest(
-                    userId, campaignId, area, row, column, null, "PENDING", null
+                    requestId, userId, campaignId, area, row, column, null, "PENDING", null
             );
             kafkaTemplate.send("ticket-purchase", request);
+            return String.format("{\"status\": \"PENDING\", \"requestId\": \"%s\", \"message\": \"Ticket purchase request has been queued for processing.\"}", requestId);
 
-            return "{\"status\": \"PENDING\", \"message\": \"Ticket purchase request has been queued for processing.\"}";
         } catch (Exception e) {
             log.error(e.getMessage());
             return "{\"error\": \"SYSTEM_ERROR\", \"message\": \"An error occurred while processing your request.\"}";

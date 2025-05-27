@@ -13,6 +13,8 @@ public class OperateController {
     UserService userService;
     @Autowired
     TicketPurchaseProducer ticketPurchaseProducer;
+    @Autowired
+    TicketPurchaseStatusService ticketPurchaseStatusService;
 
     @PostMapping("/buyTicket")
     public String buyTicket(@RequestBody TicketRequest request) {
@@ -20,6 +22,11 @@ public class OperateController {
 //                                     request.getArea(), request.getRow(), request.getColumn());
         return ticketPurchaseProducer.produceTicketPurchase(request.getUserId(), request.getCampaignId(),
                 request.getArea(), request.getRow(), request.getColumn());
+    }
+
+    @GetMapping("/getPurchaseStatus")
+    public String getPurchaseStatus(@RequestParam(value = "requestId") String requestId) {
+        return ticketPurchaseStatusService.getPurchaseStatus(requestId);
     }
 
     @GetMapping("/payTicket")

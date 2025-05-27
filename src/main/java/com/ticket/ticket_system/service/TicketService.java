@@ -26,7 +26,7 @@ public class TicketService {
             if (!seat.isPresent()) return "error: no seat";
 
             // Check if seat is already reserved
-            if (seat.get().getStatus().equals("occupied") || seat.get().getStatus().equals("purchased")) {
+            if (seat.get().getStatus().equals("reserved") || seat.get().getStatus().equals("purchased")) {
                 return "{\"error\": \"SEAT_ALREADY_RESERVED\", \"message\": \"This seat has already been reserved. Please select another seat.\"}";
             }
 
@@ -34,7 +34,7 @@ public class TicketService {
             Long seatId = seat.get().getId();
             Ticket ticket = new Ticket(null, userId, seatId, false, new Date());
             ticketRepository.save(ticket);
-            seatRepository.updateStatus(seat.get().getId(), "occupied");
+            seatRepository.updateStatus(seat.get().getId(), "reserved");
             return String.format("{\"ticketId\": %d}", ticket.getId());
         } catch (Exception e) {
             log.error(e.getMessage());

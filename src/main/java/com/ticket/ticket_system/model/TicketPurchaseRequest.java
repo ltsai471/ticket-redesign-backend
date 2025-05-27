@@ -11,6 +11,8 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TicketPurchaseRequest implements Serializable {
+
+    private String requestId;
     private Long userId;
     private Long campaignId;
     private String area;
@@ -19,6 +21,14 @@ public class TicketPurchaseRequest implements Serializable {
     private Long ticketId;
     private String status;
     private String errorMessage;
+
+    public String getRequestId() {
+        return requestId;
+    }
+
+    public void setRequestId(String requestId) {
+        this.requestId = requestId;
+    }
 
     public Long getUserId() {
         return userId;
