@@ -1,0 +1,74 @@
+groups:
+  - name: memory_utilization
+    rules:
+      # Memory utilization percentage
+      - record: memory_utilization_percent
+        expr: (jvm_memory_used_bytes{area="heap"} / jvm_memory_max_bytes{area="heap"}) * 100
+
+      # Memory utilization by instance
+      - record: memory_utilization_by_instance
+        expr: (jvm_memory_used_bytes{area="heap"} / jvm_memory_max_bytes{area="heap"}) * 100
+        labels:
+          instance: "{{ $labels.instance }}"
+
+      # Memory utilization average over 1 hour
+      - record: memory_utilization_1h_avg
+        expr: avg_over_time(memory_utilization_percent[1h])
+
+      # Memory utilization max over 1 hour
+      - record: memory_utilization_1h_max
+        expr: max_over_time(memory_utilization_percent[1h])
+
+      # Memory utilization min over 1 hour
+      - record: memory_utilization_1h_min
+        expr: min_over_time(memory_utilization_percent[1h])
+
+      # Memory pool utilization
+      - record: memory_pool_utilization
+        expr: (jvm_memory_used_bytes / jvm_memory_max_bytes) * 100
+        labels:
+          pool: "{{ $labels.id }}"
+
+      # GC Statistics
+      - record: gc_collection_rate
+        expr: rate(jvm_gc_collection_seconds_count[5m])
+
+      - record: gc_collection_duration
+        expr: rate(jvm_gc_collection_seconds_sum[5m])
+
+      - record: gc_collection_frequency
+        expr: sum(rate(jvm_gc_collection_seconds_count[5m])) by (gc)
+
+      - record: gc_pause_time
+        expr: sum(rate(jvm_gc_pause_seconds_sum[5m])) by (gc)
+
+      # Memory Allocation Rate
+      - record: memory_allocation_rate
+        expr: rate(jvm_gc_allocation_rate_bytes[5m])
+
+      # Memory Pool Details
+      - record: memory_pool_used
+        expr: jvm_memory_used_bytes
+        labels:
+          pool: "{{ $labels.id }}"
+
+      - record: memory_pool_committed
+        expr: jvm_memory_committed_bytes
+        labels:
+          pool: "{{ $labels.id }}"
+
+      - record: memory_pool_max
+        expr: jvm_memory_max_bytes
+        labels:
+          pool: "{{ $labels.id }}"
+
+      # Non-Heap Memory
+      - record: non_heap_memory_used
+        expr: jvm_memory_used_bytes{area="nonheap"}
+
+      - record: non_heap_memory_committed
+        expr: jvm_memory_committed_bytes{area="nonheap"}
+
+      # Memory Pressure
+      - record: memory_pressure
+        expr: (jvm_memory_used_bytes{area="heap"} / jvm_memory_committed_bytes{area="heap"}) * 100 

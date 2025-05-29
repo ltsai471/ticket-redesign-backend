@@ -34,3 +34,16 @@ docker-compose up --build
 - Kafka UI
   http://localhost:8082/
 - 
+
+
+## Prometheus 
+1. install Prometheus on Windows or via docker
+2. edit prometheus.yml under /prometheus
+3. prometheus.exe --config.file=prometheus.yml
+4. http://localhost:9090
+
+## Grafana
+1. install Grafana on Windows or via docker
+2. http://localhost:3000
+3. default username and pwd are admin/admin
+4. create datasource and dashboard

@@ -1,0 +1,24 @@
+groups:
+  - name: cpu_utilization
+    rules:
+      # CPU utilization percentage
+      - record: cpu_utilization_percent
+        expr: rate(process_cpu_seconds_total[5m]) * 100
+
+      # CPU utilization by instance
+      - record: cpu_utilization_by_instance
+        expr: rate(process_cpu_seconds_total[5m]) * 100
+        labels:
+          instance: "{{ $labels.instance }}"
+
+      # CPU utilization average over 1 hour
+      - record: cpu_utilization_1h_avg
+        expr: avg_over_time(cpu_utilization_percent[1h])
+
+      # CPU utilization max over 1 hour
+      - record: cpu_utilization_1h_max
+        expr: max_over_time(cpu_utilization_percent[1h])
+
+      # CPU utilization min over 1 hour
+      - record: cpu_utilization_1h_min
+        expr: min_over_time(cpu_utilization_percent[1h]) 
