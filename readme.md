@@ -6,6 +6,7 @@ http://localhost:8080/setup/addSeatsByCampaign?campaignId=1
 
 ## System Endpoint
 http://localhost:8080
+npm run dev
 
 ## Docker Test
 //docker-compose up --build

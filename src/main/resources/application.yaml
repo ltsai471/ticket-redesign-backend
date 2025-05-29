@@ -45,28 +45,29 @@ mybatis:
   configuration:
     map-underscore-to-camel-case: true
 management:
-  server:
-    port: 8081
-    base-path: /management
   endpoints:
+    enabled-by-default: true
     web:
       exposure:
-        include: health,info,metrics,prometheus
-#        include: "*" # health, info, metrics
+        include: "*"
       base-path: /actuator
     health:
       show-details: always
   endpoint:
+    health:
+      show-details: always
     prometheus:
       enabled: true
+  server:
+    port: 8081
   metrics:
     enable:
       all: true
     export:
       prometheus:
         enabled: true
-#    tags:
-#      application: ${spring.application.name}
+    tags:
+      application: ${spring.application.name}
     distribution:
       percentiles-histogram:
         http:
