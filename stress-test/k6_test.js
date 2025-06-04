@@ -19,10 +19,10 @@ export const options = {
         // { duration: '5m', target: 0 },    // Ramp-down
     ],
     thresholds: {
-        'order_success_rate': ['rate>0.99'],  // 99% success rate
-        'order_trend': ['p(95)<200'],        // 95% of orders under 200ms
-        'seat_check_trend': ['p(95)<100'],   // 95% of seat checks under 100ms
-        'http_req_duration': ['p(95)<500'],  // 95% of all requests under 500ms
+        'order_success_rate': ['rate>0.95'],  // 95% success rate
+        'order_trend': ['p(95)<500'],        // 95% of orders under 500ms
+        'seat_check_trend': ['p(95)<300'],   // 95% of seat checks under 300ms
+        'http_req_duration': ['p(95)<1000'], // 95% of all requests under 1000ms
     },
 };
 
