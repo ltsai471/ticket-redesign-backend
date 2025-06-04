@@ -6,6 +6,7 @@ http://localhost:8080/setup/addSeatsByCampaign?campaignId=1
 
 ## System Endpoint
 http://localhost:8080
+http://localhost:8080
 npm run dev
 
 ## Docker Test
@@ -49,3 +50,19 @@ docker-compose up --build
 2. http://localhost:3000
 3. default username and pwd are admin/admin
 4. create datasource and dashboard
+
+
+## Stress Testing
+### locust
+```
+cd ticket-redesign/stress-test
+pip install -r requirements.txt
+locust -f load_test.py --host=http://localhost:8080
+// Open the Locust web interface at http://localhost:8089
+```
+
+
+### k6
+```
+k6 run k6_test.js
+```
