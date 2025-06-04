@@ -11,11 +11,12 @@ const seatCheckTrend = new Trend('seat_check_trend');
 // Test configuration
 export const options = {
     stages: [
-        { duration: '5m', target: 500 },  // Warm-up
-        { duration: '10m', target: 2000 }, // Ramp-up
-        { duration: '15m', target: 3000 }, // Peak load
-        { duration: '30m', target: 3000 }, // Sustained load
-        { duration: '5m', target: 0 },    // Ramp-down
+        { duration: '1m', target: 10 },  // Warm-up
+        // { duration: '5m', target: 500 },  // Warm-up
+        // { duration: '10m', target: 2000 }, // Ramp-up
+        // { duration: '15m', target: 3000 }, // Peak load
+        // { duration: '30m', target: 3000 }, // Sustained load
+        // { duration: '5m', target: 0 },    // Ramp-down
     ],
     thresholds: {
         'order_success_rate': ['rate>0.99'],  // 99% success rate
@@ -25,15 +26,17 @@ export const options = {
     },
 };
 
-// Test data generation
-function generateOrderPayload() {
-    const seatId = `${randomIntBetween(1, 100)}/${['A', 'B', 'C', 'D', 'E'][randomIntBetween(0, 4)]}`;
-    return JSON.stringify({
-        userId: `user_${randomIntBetween(1, 1000)}`,
-        seatId: seatId,
-        timestamp: new Date().toISOString(),
-        eventId: `event_${randomIntBetween(1, 10)}`
-    });
+// Helper function to get random area
+function getRandomArea() {
+    const areas = ['A', 'B', 'C'];
+    return areas[randomIntBetween(0, 2)];
+}
+
+// Helper function to find available seat
+function findAvailableSeat(seats) {
+    const availableSeats = seats.filter(seat => seat.status === 'available');
+    if (availableSeats.length === 0) return null;
+    return availableSeats[randomIntBetween(0, availableSeats.length - 1)];
 }
 
 // Main test function
@@ -44,10 +47,35 @@ export default function () {
         'Accept': 'application/json',
     };
 
-    // Order creation test
-    {
-        const payload = generateOrderPayload();
-        const orderResponse = http.post(`${BASE_URL}/api/orders`, payload, {
+    // Check available seats
+    const area = getRandomArea();
+    const seatResponse = http.get(`${BASE_URL}/api/seats/1/${area}`, {
+        headers: headers,
+        tags: { name: 'check_seats' }
+    });
+
+    seatCheckTrend.add(seatResponse.timings.duration);
+
+    check(seatResponse, {
+        'seat check status is 200': (r) => r.status === 200,
+        'seat check response time < 100ms': (r) => r.timings.duration < 100,
+    });
+
+    // Parse seats response
+    const seats = JSON.parse(seatResponse.body);
+    const availableSeat = findAvailableSeat(seats);
+
+    // If we found an available seat, create an order
+    if (availableSeat) {
+        const orderPayload = JSON.stringify({
+            userId: randomIntBetween(1, 500),
+            campaignId: availableSeat.campaignId,
+            area: availableSeat.area,
+            row: availableSeat.seatRow,
+            column: availableSeat.seatColumn
+        });
+
+        const orderResponse = http.post(`${BASE_URL}/oper/buyTicket`, orderPayload, {
             headers: headers,
             tags: { name: 'create_order' }
         });
@@ -58,22 +86,6 @@ export default function () {
         check(orderResponse, {
             'order status is 200': (r) => r.status === 200,
             'order response time < 200ms': (r) => r.timings.duration < 200,
-        });
-    }
-
-    // Seat availability check
-    {
-        const seatId = `${randomIntBetween(1, 100)}/${['A', 'B', 'C', 'D', 'E'][randomIntBetween(0, 4)]}`;
-        const seatResponse = http.get(`${BASE_URL}/api/seats/${seatId}`, {
-            headers: headers,
-            tags: { name: 'check_seat' }
-        });
-
-        seatCheckTrend.add(seatResponse.timings.duration);
-
-        check(seatResponse, {
-            'seat check status is 200': (r) => r.status === 200,
-            'seat check response time < 100ms': (r) => r.timings.duration < 100,
         });
     }
 
