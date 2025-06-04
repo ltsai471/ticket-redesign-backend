@@ -44,6 +44,20 @@ services:
     networks:
       - ticket-network
 
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redis-data:/data
+    networks:
+      - ticket-network
+
 networks:
   ticket-network:
-    driver: bridge 
+    driver: bridge
+
+volumes:
+  redis-data: 

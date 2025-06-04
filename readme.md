@@ -42,6 +42,7 @@ docker-compose up --build
 2. edit prometheus.yml under /prometheus
 3. prometheus.exe --config.file=prometheus.yml
 4. http://localhost:9090
+5. http://localhost:8081/actuator/prometheus
 
 ## Grafana
 1. install Grafana on Windows or via docker
