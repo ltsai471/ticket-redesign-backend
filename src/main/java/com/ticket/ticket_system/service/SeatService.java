@@ -53,19 +53,18 @@ public class SeatService {
     }
 
     public List<Seat> getSeatsByArea(Long campaignId, String area) {
-        log.info("Getting seats for campaign {} and area {}", campaignId, area);
-
         List<Seat> cachedSeats = seatCacheService.getSeatAvailability(campaignId, area);
         if (cachedSeats != null) {
-            log.info("Cache hit for seats in area {}", area);
+            log.info("Cache hit for seats in campaign {} and area {}", campaignId, area);
             return cachedSeats;
         }
 
         List<Seat> seats = seatRepository.findByCampaignAndArea(campaignId, area);
 
         if (seats != null && !seats.isEmpty()) {
-            seatCacheService.cacheSeatAvailability(campaignId, area, new ArrayList<>(seats));
-            log.info("Cached seats for area {}", area);
+//            seatCacheService.cacheSeatAvailability(campaignId, area, new ArrayList<>(seats));
+            seatCacheService.getSeatAvailabilityWithLock(campaignId, area);
+            log.info("Cache missed. Getting seats for campaign {} and area {}", campaignId, area);
         }
         
         return seats;
