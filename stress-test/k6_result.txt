@@ -1,0 +1,61 @@
+## k6 report
+
+     scenarios: (100.00%) 1 scenario, 10 max VUs, 1m30s max duration (incl. graceful stop):
+              * default: Up to 10 looping VUs for 1m0s over 1 stages (gracefulRampDown: 30s, gracefulStop: 30s)
+
+
+     ✓ seat check status is 200
+     ✗ seat check response time < 100ms
+      ↳  33% — ✓ 102 / ✗ 206
+     ✓ order status is 200
+     ✗ order response time < 200ms
+      ↳  82% — ✓ 255 / ✗ 53
+
+     checks.........................: 78.97%  973 out of 1232
+     data_received..................: 548 MB  8.9 MB/s
+     data_sent......................: 118 kB  1.9 kB/s
+     http_req_blocked...............: avg=255.78µs   min=0s      med=0s        max=98.66ms   p(90)=0s        p(95)=0s
+     http_req_connecting............: avg=56.28µs    min=0s      med=0s        max=14.93ms   p(90)=0s        p(95)=0s
+   ✗ http_req_duration..............: avg=190.75ms   min=3.11ms  med=92.6ms    max=1.5s      p(90)=518.72ms  p(95)=666.87ms
+       { expected_response:true }...: avg=190.75ms   min=3.11ms  med=92.6ms    max=1.5s      p(90)=518.72ms  p(95)=666.87ms
+     http_req_failed................: 0.00%   0 out of 616
+     http_req_receiving.............: avg=13.08ms    min=0s      med=537.35µs  max=514.5ms   p(90)=42.66ms   p(95)=60.83ms
+     http_req_sending...............: avg=178.71µs   min=0s      med=0s        max=14.05ms   p(90)=523.05µs  p(95)=978.42µs
+     http_req_tls_handshaking.......: avg=0s         min=0s      med=0s        max=0s        p(90)=0s        p(95)=0s
+     http_req_waiting...............: avg=177.49ms   min=2.3ms   med=88.72ms   max=1.42s     p(90)=476.74ms  p(95)=621.56ms
+     http_reqs......................: 616     10.056934/s
+     iteration_duration.............: avg=999.01ms   min=109.3ms med=806.48ms  max=3.06s     p(90)=2.04s     p(95)=2.21s
+     iterations.....................: 308     5.028467/s
+   ✓ order_success_rate.............: 100.00% 308 out of 308
+   ✗ order_trend....................: avg=100.445023 min=3.119   med=21.52055  max=928.3473  p(90)=286.08106 p(95)=452.891085
+   ✗ seat_check_trend...............: avg=281.070579 min=4.2159  med=222.57555 max=1502.4339 p(90)=635.32213 p(95)=746.015635
+     vus............................: 2       min=1           max=9
+     vus_max........................: 10      min=10          max=10
+
+running (1m01.3s), 00/10 VUs, 308 complete and 0 interrupted iterations
+
+=======================================
+## 解读
+1. TPS (Transactions Per Second) / QPS (Queries Per Second):
+- `http_reqs: 616` with a rate of `10.056934/s`: 系统每秒处理10个requests
+- 每一回(iteration)有2个requests (一个是查座位, 一个是订票)
+- `iterations: 308` (308*2=616)
+
+2. Response Times 响应时间 `http_req_duration`:
+- Average response time `avg: 190.75ms`
+- 95th percentile: 666.87ms (this is crossing our threshold of 500ms)
+- Maximum response time: 1.5s
+
+3. Success Rates:
+HTTP request failure rate `http_req_failed`: 0% (no failed requests)
+Check success rate `checks`: 78.97% (973 out of 1232 checks passed)
+Order success rate `order_success_rate`: 100% (308 out of 308 orders successful)
+
+4. Load:
+Virtual Users (vus): 2 minimum, 9 maximum
+Target VUs: 10 (as set in your stages)
+
+5. Performance Issues:
+根据我订压测的目标，显示压测结果有没有达标
+The 95th percentile for order_trend (452.89ms) and seat_check_trend (746.01ms) are both above our thresholds
+This explains the threshold errors you're seeing

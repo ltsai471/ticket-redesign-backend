@@ -10,14 +10,16 @@ const seatCheckTrend = new Trend('seat_check_trend');
 
 // Test configuration
 export const options = {
-    stages: [
-        { duration: '1m', target: 10 },  // Warm-up
-        // { duration: '5m', target: 500 },  // Warm-up
-        // { duration: '10m', target: 2000 }, // Ramp-up
-        // { duration: '15m', target: 3000 }, // Peak load
-        // { duration: '30m', target: 3000 }, // Sustained load
-        // { duration: '5m', target: 0 },    // Ramp-down
-    ],
+    // stages: [
+    //     { duration: '1m', target: 10 },  // Warm-up
+    //     // { duration: '5m', target: 500 },  // Warm-up
+    //     // { duration: '10m', target: 2000 }, // Ramp-up
+    //     // { duration: '15m', target: 3000 }, // Peak load
+    //     // { duration: '30m', target: 3000 }, // Sustained load
+    //     // { duration: '5m', target: 0 },    // Ramp-down
+    // ],
+    vus: 10,        // Exactly 10 virtual users
+    iterations: 10,  // each VU will run exactly one iteration
     thresholds: {
         'order_success_rate': ['rate>0.95'],  // 95% success rate
         'order_trend': ['p(95)<500'],        // 95% of orders under 500ms
