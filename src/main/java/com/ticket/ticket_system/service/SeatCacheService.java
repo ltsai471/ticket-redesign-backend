@@ -64,37 +64,30 @@ public class SeatCacheService {
     public List<Seat> getSeatAvailabilityWithLock(Long campaignId, String area) {
         String key = generateKey(campaignId, area);
         String lockKey = "lock:" + key;
-        
-        // 尝试获取缓存
+
         List<Seat> seats = (List<Seat>) redis.opsForValue().get(key);
         if (seats != null) {
             return seats;
         }
-        
-        // 获取分布式锁
+
         boolean locked = redis.opsForValue().setIfAbsent(lockKey, "1", 10, TimeUnit.SECONDS);
         if (locked) {
             try {
-                // 双重检查
                 seats = (List<Seat>) redis.opsForValue().get(key);
                 if (seats != null) {
                     return seats;
                 }
-                
-                // 从数据库加载数据
+
                 seats = seatRepository.findByCampaignAndArea(campaignId, area);
-                // 更新缓存
                 if (seats != null) {
                     cacheSeatAvailability(campaignId, area, new ArrayList<>(seats));
                 }
                 return seats;
             } finally {
-                // 释放锁
                 redis.delete(lockKey);
             }
         }
-        
-        // 如果获取锁失败，等待一段时间后重试
+        //retry
         try {
             Thread.sleep(100);
             return getSeatAvailabilityWithLock(campaignId, area);

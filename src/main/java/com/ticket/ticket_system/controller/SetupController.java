@@ -1,6 +1,5 @@
 package com.ticket.ticket_system.controller;
 
-import com.ticket.ticket_system.entity.Seat;
 import com.ticket.ticket_system.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
