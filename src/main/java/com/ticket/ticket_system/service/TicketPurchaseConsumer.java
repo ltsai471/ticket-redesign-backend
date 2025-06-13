@@ -44,9 +44,9 @@ public class TicketPurchaseConsumer {
 
             // If there was an error, send to DLQ and update status
             if (result.contains("error")) {
-                statusService.updateStatus(request.getRequestId(), "FAILED", result, null);
+                statusService.updateStatus(request.getRequestId(), "FAILED", result.split(":")[1], null);
                 request.setStatus("FAILED");
-                request.setErrorMessage(result);
+                request.setErrorMessage(result.split(":")[1]);
                 kafkaTemplate.send("ticket-purchase-dlq", request);
                 log.error("Failed to process ticket purchase: {}", result);
             } else {

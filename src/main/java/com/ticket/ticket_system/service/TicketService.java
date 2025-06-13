@@ -7,10 +7,11 @@ import com.ticket.ticket_system.repository.TicketRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class TicketService {
@@ -18,27 +19,43 @@ public class TicketService {
     TicketRepository ticketRepository;
     @Autowired
     SeatRepository seatRepository;
+    @Autowired
+    private RedisTemplate<String, Object> redisTemplate;
 
     private final static Logger log = LoggerFactory.getLogger(TicketService.class);
+    private static final String SEAT_LOCK_PREFIX = "seat:lock:";
+    private static final long LOCK_TIMEOUT_MINUTES = 10;
 
     public String addTicket(Long userId, Long campaignId, String area, int row, int column) {
+        String lockKey = SEAT_LOCK_PREFIX + campaignId + ":" + area + ":" + row + ":" + column;
+        
         try {
-            Optional<Seat> seat = seatRepository.findByKey(campaignId, area, row, column);
-            if (!seat.isPresent()) return "error: no seat";
-
-            // Check if seat is already reserved
-            if (seat.get().getStatus().equals("reserved") || seat.get().getStatus().equals("purchased")) {
-                return "{\"error\": \"SEAT_ALREADY_RESERVED\", \"message\": \"This seat has already been reserved. Please select another seat.\"}";
+            Boolean acquired = redisTemplate.opsForValue().setIfAbsent(lockKey, userId, LOCK_TIMEOUT_MINUTES, TimeUnit.MINUTES);
+            
+            if (Boolean.FALSE.equals(acquired)) {
+                return "error:SEAT_ALREADY_RESERVED";
             }
 
-            log.info("ticketRepository.save");
-            Long seatId = seat.get().getId();
-            Ticket ticket = new Ticket(null, userId, seatId, false, new Date());
-            ticketRepository.create(ticket);
-            seatRepository.updateStatus(seat.get().getId(), "reserved");
-            return String.format("{\"ticketId\": %d}", ticket.getId());
+            try {
+                Optional<Seat> seat = seatRepository.findByKey(campaignId, area, row, column);
+                if (!seat.isPresent()) {
+                    return "error:NO_SEAT";
+                }
+
+                if (seat.get().getStatus().equals("reserved") || seat.get().getStatus().equals("purchased")) {
+                    return "error:SEAT_ALREADY_RESERVED";
+                }
+
+                Long seatId = seat.get().getId();
+                Ticket ticket = new Ticket(null, userId, seatId, false, new Date());
+                ticketRepository.create(ticket);
+                seatRepository.updateStatus(seat.get().getId(), "reserved");
+                return String.format("{\"ticketId\": %d}", ticket.getId());
+            } finally {
+                redisTemplate.delete(lockKey);
+            }
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error("Error in addTicket: {}", e.getMessage());
             return "{\"error\": \"SYSTEM_ERROR\", \"message\": \"An error occurred while processing your request.\"}";
         }
     }
